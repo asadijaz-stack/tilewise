@@ -1,0 +1,34 @@
+name: tilewise
+description: TileWise — an offline Scrabble-like word game for Android.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/words.txt
+    - assets/common_words.txt
+    - assets/sounds/
+
+# App launcher icon. After editing, run:
+#   flutter pub get
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/tilewise_icon.png"
+  adaptive_icon_foreground: "assets/icon/tilewise_icon.png"
+  adaptive_icon_background: "#1B5E20"

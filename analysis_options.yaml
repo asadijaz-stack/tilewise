@@ -1,0 +1,14 @@
+analyzer:
+  language:
+    strict-casts: false
+  errors:
+    unused_import: warning
+    unused_local_variable: warning
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
