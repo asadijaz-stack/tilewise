@@ -200,8 +200,8 @@ class GameState extends ChangeNotifier {
     final raw = currentPlayer.rack[rackIndex];
     if (raw.isEmpty) {
       if (blankLetter == null || blankLetter.isEmpty) return false;
-      staged[key] = StagedTile(
-          rackIndex: rackIndex, letter: blankLetter, isBlank: true);
+      staged[key] =
+          StagedTile(rackIndex: rackIndex, letter: blankLetter, isBlank: true);
     } else {
       staged[key] =
           StagedTile(rackIndex: rackIndex, letter: raw, isBlank: false);
@@ -241,10 +241,9 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Submits the staged tiles as the current player's move.
-  void submitMove() {
-    if (!canStage || staged.isEmpty) return;
-    final placements = staged.entries.map((e) {
+  /// The currently staged tiles, as placements.
+  List<PlacedTile> stagedPlacements() {
+    return staged.entries.map((e) {
       final parts = e.key.split(',');
       final s = e.value;
       return PlacedTile(
@@ -254,6 +253,58 @@ class GameState extends ChangeNotifier {
         isBlank: s.isBlank,
       );
     }).toList();
+  }
+
+  /// Live preview of the staged tiles: the word(s) and score if the
+  /// move were submitted now, or the reason it is not legal yet.
+  /// Null when nothing is staged.
+  MoveResult? previewStaged() {
+    if (staged.isEmpty) return null;
+    return evaluateMove(
+      board: board,
+      placements: stagedPlacements(),
+      dict: dict,
+      isFirstMove: firstMove,
+    );
+  }
+
+  /// Stages every tile of [placements] (e.g. a hinted move), matching
+  /// each placement to a rack tile. All-or-nothing: returns false and
+  /// stages nothing when the rack cannot supply a tile.
+  bool stageMove(List<PlacedTile> placements) {
+    if (!canStage || placements.isEmpty) return false;
+    final rack = currentPlayer.rack;
+    final used = <int>{...stagedRackIndices};
+    final plan = <(int, PlacedTile)>[];
+    for (final p in placements) {
+      var found = -1;
+      for (var i = 0; i < rack.length; i++) {
+        if (used.contains(i)) continue;
+        final ok = p.isBlank ? rack[i].isEmpty : rack[i] == p.letter;
+        if (ok) {
+          found = i;
+          break;
+        }
+      }
+      if (found < 0) return false;
+      used.add(found);
+      plan.add((found, p));
+    }
+    for (final (rackIndex, p) in plan) {
+      final ok = stageTile(rackIndex, p.row, p.col,
+          blankLetter: p.isBlank ? p.letter : null);
+      if (!ok) {
+        clearStaged();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Submits the staged tiles as the current player's move.
+  void submitMove() {
+    if (!canStage || staged.isEmpty) return;
+    final placements = stagedPlacements();
     final res = evaluateMove(
       board: board,
       placements: placements,

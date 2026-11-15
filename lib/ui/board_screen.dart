@@ -9,6 +9,7 @@ import '../game/ai_engine.dart';
 import '../game/board.dart';
 import '../game/dictionary.dart';
 import '../game/game_state.dart';
+import '../game/rules.dart';
 import '../util/sound.dart';
 import 'game_over_screen.dart';
 import 'menu_screen.dart';
@@ -49,6 +50,7 @@ class _BoardScreenState extends State<BoardScreen>
   String? _bannerText;
   int _bannerToken = 0;
   bool _thinking = false;
+  bool _hintBusy = false;
 
   static const _playerColors = [
     Colors.lightBlue,
@@ -157,16 +159,14 @@ class _BoardScreenState extends State<BoardScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E4D2B),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Blank tile = ?',
-            style: TextStyle(color: Colors.white)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title:
+            const Text('Blank tile = ?', style: TextStyle(color: Colors.white)),
         content: SizedBox(
           width: 300,
           child: GridView.builder(
             shrinkWrap: true,
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 6,
               mainAxisSpacing: 6,
               crossAxisSpacing: 6,
@@ -210,8 +210,7 @@ class _BoardScreenState extends State<BoardScreen>
       blankLetter = await _pickBlankLetter();
       if (blankLetter == null || !mounted) return;
     }
-    final ok =
-        game.stageTile(rackIndex, r, c, blankLetter: blankLetter);
+    final ok = game.stageTile(rackIndex, r, c, blankLetter: blankLetter);
     if (ok) SoundManager().play('click');
   }
 
@@ -220,8 +219,7 @@ class _BoardScreenState extends State<BoardScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E4D2B),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Pass your turn?',
             style: TextStyle(color: Colors.white)),
         content: const Text(
@@ -239,8 +237,7 @@ class _BoardScreenState extends State<BoardScreen>
               Navigator.of(ctx).pop();
               widget.game.passTurn();
             },
-            child: const Text('Pass',
-                style: TextStyle(color: Colors.amber)),
+            child: const Text('Pass', style: TextStyle(color: Colors.amber)),
           ),
         ],
       ),
@@ -252,10 +249,8 @@ class _BoardScreenState extends State<BoardScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E4D2B),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Quit game?',
-            style: TextStyle(color: Colors.white)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Quit game?', style: TextStyle(color: Colors.white)),
         content: const Text(
           'Your current game will be lost.',
           style: TextStyle(color: Colors.white70),
@@ -271,13 +266,12 @@ class _BoardScreenState extends State<BoardScreen>
               Navigator.of(ctx).pop();
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (_) => MenuScreen(
-                      dict: widget.dict, aiEngine: widget.aiEngine),
+                  builder: (_) =>
+                      MenuScreen(dict: widget.dict, aiEngine: widget.aiEngine),
                 ),
               );
             },
-            child:
-                const Text('Quit', style: TextStyle(color: Colors.red)),
+            child: const Text('Quit', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -387,8 +381,7 @@ class _BoardScreenState extends State<BoardScreen>
       builder: (_, child) {
         final t = _shakeController.value;
         final dx = 12 * sin(t * pi * 4) * (1 - t);
-        return Transform.translate(
-            offset: Offset(dx, 0), child: child);
+        return Transform.translate(offset: Offset(dx, 0), child: child);
       },
       child: Container(
         width: side,
@@ -397,14 +390,11 @@ class _BoardScreenState extends State<BoardScreen>
         decoration: BoxDecoration(
           color: const Color(0xFF5D4023),
           borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
-            BoxShadow(color: Colors.black54, blurRadius: 12)
-          ],
+          boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 12)],
         ),
         child: GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 15,
             mainAxisSpacing: 1,
             crossAxisSpacing: 1,
@@ -431,8 +421,7 @@ class _BoardScreenState extends State<BoardScreen>
           colors: [Color(0xFF8D6E3F), Color(0xFF6D4C2F)],
         ),
         boxShadow: const [
-          BoxShadow(
-              color: Colors.black38, blurRadius: 3, offset: Offset(0, 2)),
+          BoxShadow(color: Colors.black38, blurRadius: 3, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
@@ -499,8 +488,7 @@ class _BoardScreenState extends State<BoardScreen>
           child: tile,
         );
         if (game.exchangeMode || !game.canStage) {
-          return Padding(
-              padding: const EdgeInsets.all(3), child: tappable);
+          return Padding(padding: const EdgeInsets.all(3), child: tappable);
         }
         return Padding(
           padding: const EdgeInsets.all(3),
@@ -508,11 +496,9 @@ class _BoardScreenState extends State<BoardScreen>
             data: i,
             feedback: Material(
               color: Colors.transparent,
-              child:
-                  TileWidget(letter: letter, size: tileSize * 1.3),
+              child: TileWidget(letter: letter, size: tileSize * 1.3),
             ),
-            childWhenDragging:
-                SizedBox(width: tileSize, height: tileSize),
+            childWhenDragging: SizedBox(width: tileSize, height: tileSize),
             child: tappable,
           ),
         );
@@ -522,18 +508,14 @@ class _BoardScreenState extends State<BoardScreen>
 
   Widget _rackArea() {
     return LayoutBuilder(builder: (ctx, constraints) {
-      final tileSize =
-          ((constraints.maxWidth - 56) / 7.6).clamp(32.0, 50.0);
+      final tileSize = ((constraints.maxWidth - 56) / 7.6).clamp(32.0, 50.0);
       return Container(
-        margin:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFF5D4023),
           borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
-            BoxShadow(color: Colors.black38, blurRadius: 6)
-          ],
+          boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 6)],
         ),
         child: _rack(tileSize),
       );
@@ -555,14 +537,11 @@ class _BoardScreenState extends State<BoardScreen>
           const Text(
             'TileWise',
             style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 17),
+                color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17),
           ),
           const Spacer(),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.35),
               borderRadius: BorderRadius.circular(12),
@@ -614,21 +593,19 @@ class _BoardScreenState extends State<BoardScreen>
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
       transitionBuilder: (child, anim) => SlideTransition(
-        position: Tween(begin: const Offset(0, -0.6), end: Offset.zero)
-            .animate(anim),
+        position:
+            Tween(begin: const Offset(0, -0.6), end: Offset.zero).animate(anim),
         child: FadeTransition(opacity: anim, child: child),
       ),
       child: _bannerText == null
           ? const SizedBox.shrink(key: ValueKey('none'))
           : Container(
               key: ValueKey(_bannerText),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.72),
                 borderRadius: BorderRadius.circular(20),
-                border:
-                    Border.all(color: Colors.amber, width: 1.5),
+                border: Border.all(color: Colors.amber, width: 1.5),
               ),
               child: Text(
                 _bannerText!,
@@ -649,16 +626,12 @@ class _BoardScreenState extends State<BoardScreen>
     return GestureDetector(
       onTap: widget.game.clearAiMoveAnnouncement,
       child: Container(
-        margin:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
           color: Colors.amber.shade700,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(color: Colors.black45, blurRadius: 6)
-          ],
+          boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 6)],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -676,6 +649,118 @@ class _BoardScreenState extends State<BoardScreen>
             ),
             const SizedBox(width: 6),
             const Icon(Icons.close, color: Colors.white70, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ------------------------- coach + hint -------------------------
+
+  /// Finds a good everyday word for the human's rack and stages it,
+  /// so a stuck (or brand-new) player sees exactly what to do.
+  Future<void> _onHint() async {
+    final game = widget.game;
+    if (!game.canStage || game.exchangeMode || _hintBusy) return;
+    setState(() => _hintBusy = true);
+    try {
+      game.clearStaged();
+      final res = await widget.aiEngine.findMoves(
+        board: game.board,
+        rack: game.currentPlayer.rack.toList(),
+        budgetMs: 900,
+        commonVocabulary: true,
+      );
+      if (!mounted || !game.canStage || game.exchangeMode) return;
+      if (res.moves.isEmpty) {
+        _addFloater('No word with these letters — try Swap',
+            Colors.blueGrey.shade700, 14);
+        return;
+      }
+      if (game.stageMove(res.moves.first.placements)) {
+        SoundManager().play('click');
+      }
+    } catch (_) {
+      // Engine hiccup: stay quiet, the player can keep playing.
+    } finally {
+      if (mounted) setState(() => _hintBusy = false);
+    }
+  }
+
+  /// The coach: one friendly line that always tells a human player
+  /// what to do next — and, once tiles are staged, shows the word
+  /// being formed with its live score (or why it is not legal yet).
+  Widget _coachBar() {
+    final game = widget.game;
+    if (game.gameOver || game.currentPlayer.isAI) {
+      return const SizedBox.shrink();
+    }
+    final String text;
+    final Color bg;
+    final IconData icon;
+    if (game.exchangeMode) {
+      icon = Icons.swap_horiz;
+      bg = const Color(0xFF1565C0);
+      text = 'Tap the tiles you want to trade, then tap Swap.';
+    } else if (game.staged.isEmpty) {
+      icon = Icons.school_outlined;
+      bg = const Color(0xFF37474F);
+      text = game.firstMove
+          ? 'Spell a word through the ★ star in the middle. '
+              'Drag tiles up — or tap a tile, then tap a square.'
+          : 'Your turn! Build a word that touches letters on the '
+              'board. Stuck? Tap 💡 Hint below.';
+    } else {
+      final res = game.previewStaged();
+      if (res == null) return const SizedBox.shrink();
+      if (res.valid) {
+        icon = Icons.check_circle;
+        bg = const Color(0xFF2E7D32);
+        final w = res.words.isNotEmpty ? res.words.first.word : '';
+        text = res.bingo
+            ? 'BINGO! $w — ${res.score} points! Tap Play Word 🎉'
+            : '$w — ${res.score} points ✓ Tap Play Word!';
+      } else {
+        icon = Icons.info_outline;
+        bg = const Color(0xFFB26A00);
+        text = friendlyMoveError(res.error ?? 'Not a valid move');
+      }
+    }
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: Container(
+        key: ValueKey(text),
+        margin: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: const [
+            BoxShadow(color: Colors.black38, blurRadius: 5),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 19),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13.5,
+                  height: 1.25,
+                ),
+              ),
+            ),
+            if (_hintBusy)
+              const SizedBox(
+                width: 15,
+                height: 15,
+                child: CircularProgressIndicator(
+                    color: Colors.white, strokeWidth: 2.2),
+              ),
           ],
         ),
       ),
@@ -719,8 +804,7 @@ class _BoardScreenState extends State<BoardScreen>
             ),
             const SizedBox(height: 3),
             Text(label,
-                style:
-                    const TextStyle(color: Colors.white70, fontSize: 10)),
+                style: const TextStyle(color: Colors.white70, fontSize: 10)),
           ],
         ),
       ),
@@ -744,9 +828,8 @@ class _BoardScreenState extends State<BoardScreen>
           BouncyButton(
             gradient: const LinearGradient(
                 colors: [Color(0xFF43A047), Color(0xFF2E7D32)]),
-            onTap: game.exchangeSelection.isEmpty
-                ? () {}
-                : game.confirmExchange,
+            onTap:
+                game.exchangeSelection.isEmpty ? () {} : game.confirmExchange,
             child: Text('Swap ${game.exchangeSelection.length}',
                 style: const TextStyle(
                     color: Colors.white, fontWeight: FontWeight.w800)),
@@ -757,17 +840,22 @@ class _BoardScreenState extends State<BoardScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _iconBtn(Icons.shuffle, 'Shuffle', canAct ? () {
-          game.shuffleRack();
-          SoundManager().play('shuffle');
-        } : null),
-        _iconBtn(Icons.swap_horiz, 'Swap',
-            canAct ? game.toggleExchangeMode : null),
-        _iconBtn(Icons.front_hand, 'Pass',
-            canAct ? _confirmPass : null),
+        _iconBtn(
+            Icons.shuffle,
+            'Shuffle',
+            canAct
+                ? () {
+                    game.shuffleRack();
+                    SoundManager().play('shuffle');
+                  }
+                : null),
+        _iconBtn(
+            Icons.swap_horiz, 'Swap', canAct ? game.toggleExchangeMode : null),
+        _iconBtn(
+            Icons.lightbulb, 'Hint', canAct && !_hintBusy ? _onHint : null),
+        _iconBtn(Icons.front_hand, 'Pass', canAct ? _confirmPass : null),
         if (game.staged.isNotEmpty)
-          _iconBtn(Icons.undo, 'Undo',
-              canAct ? game.clearStaged : null),
+          _iconBtn(Icons.undo, 'Undo', canAct ? game.clearStaged : null),
         if (game.staged.isNotEmpty)
           BouncyButton(
             gradient: const LinearGradient(
@@ -801,18 +889,18 @@ class _BoardScreenState extends State<BoardScreen>
                   child: Center(
                     child: LayoutBuilder(
                       builder: (ctx, constraints) {
-                        final side = min(constraints.maxWidth,
-                            constraints.maxHeight);
+                        final side =
+                            min(constraints.maxWidth, constraints.maxHeight);
                         return _board(side);
                       },
                     ),
                   ),
                 ),
                 _thinkingBar(),
+                _coachBar(),
                 _rackArea(),
                 Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(8, 2, 8, 12),
+                  padding: const EdgeInsets.fromLTRB(8, 2, 8, 12),
                   child: _actions(),
                 ),
               ],
@@ -825,8 +913,7 @@ class _BoardScreenState extends State<BoardScreen>
             ),
             ..._floaters.asMap().entries.map(
                   (e) => Positioned(
-                    top: MediaQuery.of(context).size.height * 0.30 +
-                        e.key * 62,
+                    top: MediaQuery.of(context).size.height * 0.30 + e.key * 62,
                     left: 0,
                     right: 0,
                     child: Center(

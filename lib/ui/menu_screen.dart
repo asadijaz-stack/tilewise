@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import '../game/ai_engine.dart';
 import '../game/dictionary.dart';
 import 'animated_background.dart';
+import 'how_to_play_screen.dart';
 import 'setup_screen.dart';
 import 'widgets.dart';
-
 
 class MenuScreen extends StatelessWidget {
   final Dictionary dict;
@@ -23,8 +23,7 @@ class MenuScreen extends StatelessWidget {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -37,8 +36,7 @@ class MenuScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 2),
                         child: FlipIn(
                           index: i,
-                          child: TileWidget(
-                              letter: 'TILEWISE'[i], size: 38),
+                          child: TileWidget(letter: 'TILEWISE'[i], size: 38),
                         ),
                       ),
                     ),
@@ -73,8 +71,7 @@ class MenuScreen extends StatelessWidget {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.smart_toy,
-                              color: Colors.white, size: 26),
+                          Icon(Icons.smart_toy, color: Colors.white, size: 26),
                           SizedBox(width: 12),
                           Text('Play vs Computer',
                               style: TextStyle(
@@ -102,8 +99,7 @@ class MenuScreen extends StatelessWidget {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.group,
-                              color: Colors.white, size: 26),
+                          Icon(Icons.group, color: Colors.white, size: 26),
                           SizedBox(width: 12),
                           Text('Pass & Play (2–4)',
                               style: TextStyle(
@@ -119,7 +115,9 @@ class MenuScreen extends StatelessWidget {
                     index: 2,
                     child: BouncyButton(
                       color: Colors.white.withValues(alpha: 0.14),
-                      onTap: () => _showHowTo(context),
+                      onTap: () => Navigator.of(context).push(
+                        slideRoute(const HowToPlayScreen()),
+                      ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -140,8 +138,7 @@ class MenuScreen extends StatelessWidget {
                     index: 3,
                     child: Text(
                       'No internet needed • Free forever',
-                      style:
-                          TextStyle(color: Colors.white54, fontSize: 12),
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
                     ),
                   ),
                 ],
@@ -149,38 +146,6 @@ class MenuScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void _showHowTo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1E4D2B),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('How to Play',
-            style: TextStyle(color: Colors.white)),
-        content: const SingleChildScrollView(
-          child: Text(
-            '• Drag tiles from your rack onto the board, or tap a tile then tap a square.\n\n'
-            '• The first word must cover the ★ star in the center and use 2+ letters.\n\n'
-            '• Every later word must connect to existing tiles.\n\n'
-            '• Pink/red squares multiply the word, blue squares multiply the letter — but only the first time a tile lands on them.\n\n'
-            '• Use all 7 tiles in one turn for a 50-point BINGO bonus!\n\n'
-            '• Blank tiles (★) can be any letter — you pick which.\n\n'
-            '• The game ends when the bag is empty and someone plays their last tile, or when everyone passes in a row.',
-            style: TextStyle(color: Colors.white70, height: 1.45),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it',
-                style: TextStyle(color: Colors.amber)),
-          ),
-        ],
       ),
     );
   }

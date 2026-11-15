@@ -53,13 +53,36 @@ class MoveResult {
   final List<ScoredWord> words;
   final bool bingo;
 
-  const MoveResult._(this.valid, this.error, this.score, this.words, this.bingo);
+  const MoveResult._(
+      this.valid, this.error, this.score, this.words, this.bingo);
 
   factory MoveResult.ok(int score, List<ScoredWord> words, bool bingo) =>
       MoveResult._(true, null, score, words, bingo);
 
   factory MoveResult.invalid(String error) =>
       MoveResult._(false, error, 0, const [], false);
+}
+
+/// Plain-words version of a move error, for the on-screen coach that
+/// teaches new players. Technical errors become friendly guidance.
+String friendlyMoveError(String error) {
+  if (error.startsWith('Not in dictionary:')) {
+    final word = error.substring('Not in dictionary:'.length).trim();
+    return '“$word” is not a word. Try different letters.';
+  }
+  return switch (error) {
+    'The first word must cover the center star' =>
+      'Your first word must touch the ★ star in the middle.',
+    'The first word needs 2+ letters' => 'A word needs at least 2 letters.',
+    'Tiles must connect with no gaps' =>
+      'No empty squares inside a word — keep your letters side by side.',
+    'The word must connect to existing tiles' =>
+      'Your word must touch letters that are already on the board.',
+    'Tiles must be in one row or column' =>
+      'Tiles go in one straight line — one row, or one column.',
+    'That square is already taken' => 'That square already has a tile.',
+    _ => error,
+  };
 }
 
 /// Validates and scores [placements] against [board].
@@ -116,7 +139,8 @@ MoveResult evaluateMove({
       }
       if (across.valid) return across;
       if (down.valid) return down;
-      return MoveResult.invalid(down.error ?? across.error ?? 'Not a valid word');
+      return MoveResult.invalid(
+          down.error ?? across.error ?? 'Not a valid word');
     }
     final sameRow = placements.every((p) => p.row == placements.first.row);
     final sameCol = placements.every((p) => p.col == placements.first.col);
@@ -188,8 +212,7 @@ MoveResult _evaluateDirected({
     r += dr;
     c += dc;
   }
-  final mainWord =
-      runCells.map((cell) => letterAtRun(cell.$1, cell.$2)).join();
+  final mainWord = runCells.map((cell) => letterAtRun(cell.$1, cell.$2)).join();
 
   if (isFirstMove) {
     if (runCells.length < 2) {
@@ -200,8 +223,8 @@ MoveResult _evaluateDirected({
     }
   } else {
     // Must connect: overlap an existing tile or touch one orthogonally.
-    var connected = runCells
-        .any((cell) => !placedKeys.contains('${cell.$1},${cell.$2}'));
+    var connected =
+        runCells.any((cell) => !placedKeys.contains('${cell.$1},${cell.$2}'));
     if (!connected) {
       const nbrs = [(1, 0), (-1, 0), (0, 1), (0, -1)];
       for (final p in placements) {
@@ -229,9 +252,7 @@ MoveResult _evaluateDirected({
       final idx = GameBoard.index(cell.$1, cell.$2);
       final key = '${cell.$1},${cell.$2}';
       final isNew = placedKeys.contains(key);
-      final blank = isNew
-          ? placedByKey[key]!.isBlank
-          : board.isBlank[idx];
+      final blank = isNew ? placedByKey[key]!.isBlank : board.isBlank[idx];
       var lv = blank ? 0 : (tileValues[letterAtRun(cell.$1, cell.$2)] ?? 0);
       if (isNew && !board.premiumUsed[idx]) {
         switch (premiumAt(cell.$1, cell.$2)) {

@@ -3,10 +3,13 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'game/ai_engine.dart';
 import 'game/dictionary.dart';
+import 'ui/how_to_play_screen.dart';
 import 'ui/menu_screen.dart';
+import 'ui/widgets.dart';
 import 'util/sound.dart';
 
 void main() {
@@ -68,12 +71,21 @@ class _LoadingScreenState extends State<LoadingScreen> {
       final engine = await AiEngine.create();
       await engine.init(words, commonWords);
       await SoundManager().init();
+      // First launch ever: open the visual guide over the menu, so a
+      // brand-new player learns the game before their first move.
+      final prefs = await SharedPreferences.getInstance();
+      final firstLaunch = !(prefs.getBool('seenGuide') ?? false);
+      if (firstLaunch) await prefs.setBool('seenGuide', true);
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(
+      final nav = Navigator.of(context);
+      nav.pushReplacement(
         MaterialPageRoute(
           builder: (_) => MenuScreen(dict: dict, aiEngine: engine),
         ),
       );
+      if (firstLaunch) {
+        nav.push(slideRoute(const HowToPlayScreen()));
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _status = 'Something went wrong: $e');
