@@ -8,6 +8,7 @@ import '../game/dictionary.dart';
 import 'animated_background.dart';
 import 'how_to_play_screen.dart';
 import 'setup_screen.dart';
+import 'stats_screen.dart';
 import 'widgets.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -116,6 +117,28 @@ class MenuScreen extends StatelessWidget {
                     child: BouncyButton(
                       color: Colors.white.withValues(alpha: 0.14),
                       onTap: () => Navigator.of(context).push(
+                        slideRoute(const StatsScreen()),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bar_chart, color: Colors.white, size: 24),
+                          SizedBox(width: 12),
+                          Text('Your Stats',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  StaggeredIn(
+                    index: 3,
+                    child: BouncyButton(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      onTap: () => Navigator.of(context).push(
                         slideRoute(const HowToPlayScreen()),
                       ),
                       child: const Row(
@@ -135,7 +158,7 @@ class MenuScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 36),
                   const StaggeredIn(
-                    index: 3,
+                    index: 4,
                     child: Text(
                       'No internet needed • Free forever',
                       style: TextStyle(color: Colors.white54, fontSize: 12),

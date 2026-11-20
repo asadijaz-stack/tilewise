@@ -10,6 +10,7 @@ import 'animated_background.dart';
 import 'board_screen.dart';
 import 'menu_screen.dart';
 import 'setup_screen.dart';
+import 'stats_screen.dart';
 import 'widgets.dart';
 
 class GameOverScreen extends StatelessWidget {
@@ -48,14 +49,10 @@ class GameOverScreen extends StatelessWidget {
             colorIndex: i));
       }
     }
-    final newGame =
-        GameState(players: players, dict: dict, aiEngine: aiEngine);
+    final newGame = GameState(players: players, dict: dict, aiEngine: aiEngine);
     Navigator.of(context).pushReplacement(
       slideRoute(BoardScreen(
-          game: newGame,
-          config: config,
-          dict: dict,
-          aiEngine: aiEngine)),
+          game: newGame, config: config, dict: dict, aiEngine: aiEngine)),
     );
   }
 
@@ -63,8 +60,7 @@ class GameOverScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final winner = game.winnerIndex ?? 0;
     final ordered = List.generate(game.players.length, (i) => i)
-      ..sort((a, b) =>
-          game.players[b].score.compareTo(game.players[a].score));
+      ..sort((a, b) => game.players[b].score.compareTo(game.players[a].score));
     return Scaffold(
       body: FloatingTilesBackground(
         child: SafeArea(
@@ -73,8 +69,8 @@ class GameOverScreen extends StatelessWidget {
               const Confetti(),
               Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 26, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 26, vertical: 20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -93,8 +89,7 @@ class GameOverScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0, end: 1),
-                        duration:
-                            const Duration(milliseconds: 900),
+                        duration: const Duration(milliseconds: 900),
                         curve: Curves.elasticOut,
                         builder: (_, t, __) => Transform.scale(
                           scale: t,
@@ -122,46 +117,36 @@ class GameOverScreen extends StatelessWidget {
                         StaggeredIn(
                           index: 2,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               game.gameOverReason!,
                               style: const TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 13),
+                                  color: Colors.white54, fontSize: 13),
                             ),
                           ),
                         ),
                       const SizedBox(height: 22),
-                      for (var rank = 0;
-                          rank < ordered.length;
-                          rank++)
+                      for (var rank = 0; rank < ordered.length; rank++)
                         Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.only(bottom: 10),
                           child: StaggeredIn(
                             index: 3 + rank,
-                            child: _scoreRow(
-                                ordered[rank], rank),
+                            child: _scoreRow(ordered[rank], rank),
                           ),
                         ),
                       const SizedBox(height: 26),
                       StaggeredIn(
                         index: 7,
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             BouncyButton(
-                              color:
-                                  Colors.white.withValues(alpha: 0.16),
+                              color: Colors.white.withValues(alpha: 0.16),
                               onTap: () =>
-                                  Navigator.of(context)
-                                      .pushReplacement(
+                                  Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
                                   builder: (_) => MenuScreen(
-                                      dict: dict,
-                                      aiEngine: aiEngine),
+                                      dict: dict, aiEngine: aiEngine),
                                 ),
                               ),
                               child: const Text('Menu',
@@ -171,18 +156,33 @@ class GameOverScreen extends StatelessWidget {
                                       fontSize: 17)),
                             ),
                             BouncyButton(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF43A047),
-                                  Color(0xFF2E7D32)
+                              color: Colors.white.withValues(alpha: 0.16),
+                              onTap: () => Navigator.of(context).push(
+                                slideRoute(const StatsScreen()),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.bar_chart,
+                                      color: Colors.white, size: 20),
+                                  SizedBox(width: 7),
+                                  Text('Stats',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 17)),
                                 ],
+                              ),
+                            ),
+                            BouncyButton(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF43A047), Color(0xFF2E7D32)],
                               ),
                               onTap: () => _rematch(context),
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.refresh,
-                                      color: Colors.white),
+                                  Icon(Icons.refresh, color: Colors.white),
                                   SizedBox(width: 8),
                                   Text('Rematch',
                                       style: TextStyle(
@@ -221,8 +221,7 @@ class GameOverScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(medals[rank.clamp(0, 3)],
-              style: const TextStyle(fontSize: 22)),
+          Text(medals[rank.clamp(0, 3)], style: const TextStyle(fontSize: 22)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -246,8 +245,7 @@ class GameOverScreen extends StatelessWidget {
                 if (p.bestWord != null)
                   Text(
                     'Best: ${p.bestWord} (+${p.bestWordScore})',
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 12),
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
               ],
             ),

@@ -10,6 +10,7 @@ import '../game/board.dart';
 import '../game/dictionary.dart';
 import '../game/game_state.dart';
 import '../game/rules.dart';
+import '../game/stats_store.dart';
 import '../util/sound.dart';
 import 'game_over_screen.dart';
 import 'menu_screen.dart';
@@ -51,6 +52,7 @@ class _BoardScreenState extends State<BoardScreen>
   int _bannerToken = 0;
   bool _thinking = false;
   bool _hintBusy = false;
+  bool _statsRecorded = false;
 
   static const _playerColors = [
     Colors.lightBlue,
@@ -106,6 +108,7 @@ class _BoardScreenState extends State<BoardScreen>
         case InfoEvent():
           _addFloater(e.message, Colors.blueGrey.shade700, 15);
         case GameOverEvent():
+          _recordStats();
           SoundManager().play('win');
           _goToGameOver();
       }
@@ -139,6 +142,18 @@ class _BoardScreenState extends State<BoardScreen>
 
   void _shake() {
     _shakeController.forward(from: 0);
+  }
+
+  /// Saves the finished game to the stats history (once per game).
+  void _recordStats() {
+    if (_statsRecorded) return;
+    _statsRecorded = true;
+    final vsAi = widget.config.mode == SetupMode.vsAi;
+    StatsStore.record(GameRecord.fromGame(
+      widget.game,
+      vsComputer: vsAi,
+      difficulty: vsAi ? widget.config.difficulty : null,
+    ));
   }
 
   void _goToGameOver() {
