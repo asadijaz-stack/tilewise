@@ -11,6 +11,7 @@ import 'ui/how_to_play_screen.dart';
 import 'ui/menu_screen.dart';
 import 'ui/widgets.dart';
 import 'util/sound.dart';
+import 'util/update_check.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,6 +87,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       if (firstLaunch) {
         nav.push(slideRoute(const HowToPlayScreen()));
       }
+      // One-shot Play Store update check: if a newer version is live,
+      // Play's update screen opens over the app. Fire-and-forget —
+      // it silently does nothing for sideloaded/debug builds.
+      checkForPlayUpdate();
     } catch (e) {
       if (!mounted) return;
       setState(() => _status = 'Something went wrong: $e');
